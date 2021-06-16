@@ -1,0 +1,28 @@
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+**/target
+*/.class
+*.class
+*/lib_managed
+*.jar
+*.orig
+*.rej
+state
+**/*.log
+*.log
+file_data/*
+
+# Scala-IDE specific
+**/.idea
+.scala_dependencies
+.worksheet
+.bsp/
+
+project/boot/
+
+*.iml
+.DS_Store
+tmp
