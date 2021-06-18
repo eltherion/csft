@@ -83,6 +83,15 @@ val encryption = project
   )
   .configs(ItTest)
 
+val networking = project
+  .in(file("networking"))
+  .settings(commonSettings)
+  .settings(
+    name := "networking",
+    inConfig(ItTest)(Defaults.itSettings)
+  )
+  .configs(ItTest)
+
 val client = project
   .in(file("client"))
   .settings(commonSettings)
@@ -91,7 +100,7 @@ val client = project
     inConfig(ItTest)(Defaults.itSettings)
   )
   .configs(ItTest)
-  .dependsOn(encryption)
+  .dependsOn(encryption, networking)
 
 val root = project.in(file("."))
   .settings(commonSettings)
@@ -99,5 +108,5 @@ val root = project.in(file("."))
     inConfig(ItTest)(Defaults.itSettings)
   )
   .configs(ItTest)
-  .aggregate(server, encryption, client)
-  .dependsOn(server, encryption, client)
+  .aggregate(server, encryption, networking, client)
+  .dependsOn(server, encryption, networking, client)
