@@ -11,6 +11,7 @@ object Dependencies {
   private val http4sServer    = "org.http4s"                  %% "http4s-blaze-server"                  % VersionsOf.http4s
   private val janino          = "org.codehaus.janino"         %  "janino"                               % VersionsOf.janino
   private val logbackClassic  = "ch.qos.logback"              %  "logback-classic"                      % VersionsOf.logbackClassic
+  private val pureconfig      = "com.github.pureconfig"       %% "pureconfig"                           % VersionsOf.pureconfig
   private val scalaLogging    = "com.typesafe.scala-logging"  %% "scala-logging"                        % VersionsOf.scalaLogging
   private val scalatest       = "org.scalatest"               %% "scalatest"                            % VersionsOf.scalatest      % Test
 
@@ -25,6 +26,7 @@ object Dependencies {
     http4sDsl,
     http4sServer,
     logbackClassic,
+    pureconfig,
     scalaLogging,
     scalatest
   )
