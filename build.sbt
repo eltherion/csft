@@ -110,3 +110,6 @@ val root = project.in(file("."))
   .configs(ItTest)
   .aggregate(server, encryption, networking, client)
   .dependsOn(server, encryption, networking, client)
+
+addCommandAlias("upload", ";runMain pl.datart.csft.client.Upload")
+addCommandAlias("download", ";runMain pl.datart.csft.client.Download")
