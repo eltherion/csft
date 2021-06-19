@@ -113,3 +113,4 @@ val root = project.in(file("."))
 
 addCommandAlias("upload", ";runMain pl.datart.csft.client.Upload")
 addCommandAlias("download", ";runMain pl.datart.csft.client.Download")
+addCommandAlias("server", ";runMain pl.datart.csft.server.Server")

@@ -13,7 +13,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.io._
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-import java.security.{Provider, SecureRandom, Security}
+import java.security.{SecureRandom, Security}
 
 trait Encryption[F[_]] {
   def encrypt(inputStream: InputStream, passphrase: String): F[ByteArrayOutputStream]
