@@ -25,24 +25,46 @@ class CSFTClientImpl[F[_]](encryption: Encryption[F], networking: NetworkStreami
 
   def encryptAndSent(inputFile: JFile, uri: Uri, passphrase: String): F[UUID] = {
     for {
-      encryptedFile <- async.delay(File.newTemporaryFile())
-      _             <- encryption.encryptFile(inputFile, encryptedFile.pathAsString, passphrase)
-      inputStream   <- async.delay(encryptedFile.newInputStream)
-      responseBytes <- networking.sendStream(inputStream, uri, POST)
-      uuidString    <- responseBytes.take(uuidStringLength).through(utf8Decode).compile.lastOrError
-      uuid          <- async.delay(UUID.fromString(uuidString))
-      _             <- async.delay(inputStream.close())
-      _             <- async.delay(encryptedFile.delete())
+      encryptedFile <- async.delay(File.newTemporaryFile()) // a new temporary file to store encrypted content
+      _             <- encryption.encryptFile(
+                         inputFile,
+                         encryptedFile.pathAsString,
+                         passphrase
+                       ) // encrypting using given output path and passphrase
+      inputStream   <- async.delay(encryptedFile.newInputStream) // getting an InputStream from the encrypted file
+      responseBytes <- networking.sendStream(
+                         inputStream,
+                         uri,
+                         POST
+                       ) // and sending it through the network using given service uri and HTTP method
+      uuidString <- responseBytes
+                      .take(uuidStringLength)
+                      .through(utf8Decode)
+                      .compile
+                      .lastOrError // getting server response as a string
+      uuid <- async.delay(UUID.fromString(uuidString)) // getting a file UUID from the response
+      _    <- async.delay(inputStream.close())         // tidying up
+      _    <- async.delay(encryptedFile.delete())      // tidying up
     } yield uuid
   }
   def fetchAndDecrypt(uuid: UUID, uri: Uri, passphrase: String, outputFile: JFile): F[Unit] = {
     for {
-      uuidStream    <- async.delay(new ByteArrayInputStream(uuid.toString.getBytes(Charset.defaultCharset())))
-      responseBytes <- networking.sendStream(uuidStream, uri.addPath(uuid.toString), GET)
-      encryptedFile <- async.delay(File.newTemporaryFile())
-      _             <- responseBytes.through(Files[F].writeAll(encryptedFile.path)).compile.drain
-      _             <- encryption.decryptFile(encryptedFile.toJava, outputFile.getAbsolutePath, passphrase)
-      _             <- async.delay(encryptedFile.delete())
+      uuidStream <- async.delay(
+                      new ByteArrayInputStream(uuid.toString.getBytes(Charset.defaultCharset()))
+                    ) // creating bytes stream from the file UUID
+      responseBytes <-
+        networking.sendStream(uuidStream, uri.addPath(uuid.toString), GET) // asking for an encrypted file
+      encryptedFile <- async.delay(File.newTemporaryFile()) // a new temporary file to store encrypted content
+      _             <- responseBytes
+                         .through(Files[F].writeAll(encryptedFile.path))
+                         .compile
+                         .drain // writing bytes from the response to the temp file
+      _ <- encryption.decryptFile(
+             encryptedFile.toJava,
+             outputFile.getAbsolutePath,
+             passphrase
+           ) // decrypting file to a given output path
+      _ <- async.delay(encryptedFile.delete()) // tidying up
     } yield ()
   }
 }

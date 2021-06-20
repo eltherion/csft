@@ -21,19 +21,28 @@ class SSLContextProviderImpl[F[_]](keyStoreLocation: String, keyStorePassphrase:
       val ksStream = File(keyStoreLocation).newInputStream
       assert(Option(ksStream).nonEmpty)
 
-      val ks = KeyStore.getInstance("JKS")
-      ks.load(ksStream, keyStorePassphrase.toCharArray)
+      val ks = KeyStore.getInstance("JKS") // creating JKS
+      ks.load(
+        ksStream,
+        keyStorePassphrase.toCharArray
+      ) // loading the content of the key store file using provided passphrase
 
-      val kmf = KeyManagerFactory.getInstance("SunX509")
-      kmf.init(ks, keyStorePassphrase.toCharArray)
+      val kmf = KeyManagerFactory.getInstance("SunX509") // creating a factory for key managers
+      kmf.init(ks, keyStorePassphrase.toCharArray) // initializing the factory with the key store from above
 
-      val context = SSLContext.getInstance("SSL")
+      val context = SSLContext.getInstance("SSL") // creating a SSLContext for the SSL protocol
 
       val tmf =
-        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm)
-      tmf.init(ks)
+        TrustManagerFactory.getInstance(
+          TrustManagerFactory.getDefaultAlgorithm
+        )          // creating a factory for trust managers
+      tmf.init(ks) // initializing the factory using the key store from the above
 
-      context.init(kmf.getKeyManagers, tmf.getTrustManagers, new SecureRandom())
+      context.init(
+        kmf.getKeyManagers,
+        tmf.getTrustManagers,
+        new SecureRandom()
+      ) // finally - initializing SSLContext instance
 
       context
     }

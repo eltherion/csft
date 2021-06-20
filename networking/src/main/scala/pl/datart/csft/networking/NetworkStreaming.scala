@@ -15,16 +15,16 @@ class NetworkStreamingImpl[F[_]](client: Client[F])(implicit async: Async[F]) ex
 
   def sendStream(inputStream: InputStream, uri: Uri, method: Method): F[fs2.Stream[F, Byte]] = {
     val chunkSize = 1024
-    val request   = Request[F](
+    val request   = Request[F]( // creating a request
       method = method,
       uri = uri,
-      body = readInputStream(async.delay(inputStream), chunkSize)
+      body = readInputStream(async.delay(inputStream), chunkSize) // putting an input stream to a request body
     )
 
     async.delay {
       client
-        .stream(request)
-        .flatMap(_.body)
+        .stream(request) // running the request as a stream
+        .flatMap(_.body) // getting response body which is a stream, too
     }
   }
 }
