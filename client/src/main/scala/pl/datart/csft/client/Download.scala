@@ -24,13 +24,20 @@ object Download extends IOApp with StrictLogging {
         BlazeClientBuilder[IO](global.compute).resource.use { client =>
           for {
             uuid         <- IO.delay(UUID.fromString(uuid))
-            clientConfig <- IO.delay(ConfigSource.default.loadOrThrow[ClientConfig])
-            encryption   <- Encryption.aesEncryptionInstance[IO]
-            networking   <- IO.delay(new NetworkStreamingImpl[IO](client))
-            fileClient   <- IO.delay(new CSFTClientImpl[IO](encryption, networking))
-            _            <- IO.delay(logger.info(s"Download and decrypting your file..."))
-            _            <- fileClient.fetchAndDecrypt(uuid, clientConfig.uri, passphrase, new File(outputFile))
-            _            <- IO.delay(logger.info(s"Download succeeded. Your file location is: $outputFile."))
+            clientConfig <- IO.delay(ConfigSource.default.loadOrThrow[ClientConfig]) // loading config for a sever
+            encryption   <-
+              Encryption.aesEncryptionInstance[IO] // getting an instance of an encrypting tool that uses AES
+            networking <-
+              IO.delay(new NetworkStreamingImpl[IO](client)) // getting an instance of a network streaming tool
+            fileClient <- IO.delay(new CSFTClientImpl[IO](encryption, networking)) // getting an instance of a client
+            _          <- IO.delay(logger.info(s"Download and decrypting your file..."))
+            _          <- fileClient.fetchAndDecrypt(
+                            uuid,
+                            clientConfig.uri,
+                            passphrase,
+                            new File(outputFile)
+                          ) // getting file for a UUID and decrypting
+            _ <- IO.delay(logger.info(s"Download succeeded. Your file location is: $outputFile."))
           } yield ExitCode.Success
         }
       case _                                                            =>

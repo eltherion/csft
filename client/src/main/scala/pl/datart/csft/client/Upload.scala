@@ -22,13 +22,17 @@ object Upload extends IOApp with StrictLogging {
       case inputFile :: passphrase :: _ if passphrase.nonEmpty =>
         BlazeClientBuilder[IO](global.compute).resource.use { client =>
           for {
-            clientConfig <- IO.delay(ConfigSource.default.loadOrThrow[ClientConfig])
-            encryption   <- Encryption.aesEncryptionInstance[IO]
-            networking   <- IO.delay(new NetworkStreamingImpl[IO](client))
-            fileClient   <- IO.delay(new CSFTClientImpl[IO](encryption, networking))
-            _            <- IO.delay(logger.info(s"Encrypting and uploading your file..."))
-            uuid         <- fileClient.encryptAndSent(new File(inputFile), clientConfig.uri, passphrase)
-            _            <- IO.delay(logger.info(s"Upload succeeded. Your file fetch ID is: ${uuid.toString}."))
+            clientConfig <- IO.delay(ConfigSource.default.loadOrThrow[ClientConfig]) // loading config for a sever
+            encryption   <-
+              Encryption.aesEncryptionInstance[IO] // getting an instance of an encrypting tool that uses AES
+            networking <-
+              IO.delay(new NetworkStreamingImpl[IO](client)) // getting an instance of a network streaming tool
+            fileClient <- IO.delay(new CSFTClientImpl[IO](encryption, networking)) // getting an instance of a client
+            _          <- IO.delay(logger.info(s"Encrypting and uploading your file..."))
+            uuid       <-
+              fileClient
+                .encryptAndSent(new File(inputFile), clientConfig.uri, passphrase) // encrypting and sending a file
+            _ <- IO.delay(logger.info(s"Upload succeeded. Your file fetch ID is: ${uuid.toString}."))
           } yield ExitCode.Success
         }
       case _                                                   =>
