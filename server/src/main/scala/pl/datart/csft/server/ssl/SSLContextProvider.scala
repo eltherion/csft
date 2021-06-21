@@ -30,7 +30,7 @@ class SSLContextProviderImpl[F[_]](keyStoreLocation: String, keyStorePassphrase:
       val kmf = KeyManagerFactory.getInstance("SunX509") // creating a factory for key managers
       kmf.init(ks, keyStorePassphrase.toCharArray) // initializing the factory with the key store from above
 
-      val context = SSLContext.getInstance("SSL") // creating a SSLContext for the SSL protocol
+      val context = SSLContext.getInstance("TLSv1.3") // creating a SSLContext for the TLS v1.3 protocol
 
       val tmf =
         TrustManagerFactory.getInstance(
