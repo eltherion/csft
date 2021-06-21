@@ -2,7 +2,6 @@ package pl.datart.csft.encryption
 
 import cats.implicits._
 import cats.effect._
-import org.apache.commons.io.IOUtils
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.io._
 import org.bouncycastle.crypto.modes.CBCBlockCipher
@@ -63,7 +62,7 @@ object Encryption {
 
         //finally encrypting an input stream
         val cipherOut = new CipherOutputStream(bos, cipher)
-        val _         = IOUtils.copy(inputStream, cipherOut)
+        val _         = inputStream.transferTo(cipherOut)
 
         cipherOut.close()
         bos
@@ -101,9 +100,9 @@ object Encryption {
 
         val bos = new ByteArrayOutputStream()
 
-        // decrypting and input stream
+        // decrypting an input stream
         val cipherIn = new CipherInputStream(encStream, cipher)
-        val _        = IOUtils.copy(cipherIn, bos)
+        val _        = cipherIn.transferTo(bos)
 
         cipherIn.close()
         bos
