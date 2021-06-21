@@ -3,7 +3,6 @@ import sbt._
 object Dependencies {
   private val betterFiles     = "com.github.pathikrit"        %% "better-files"                         % VersionsOf.betterFiles
   private val bouncyCastle    = "org.bouncycastle"            %  "bcpkix-jdk15on"                       % VersionsOf.bouncyCastle
-  private val commonsIO       = "commons-io"                  % "commons-io"                            % VersionsOf.commonsIO
   private val fs2Core         = "co.fs2"                      %% "fs2-core"                             % VersionsOf.fs2
   private val fs2IO           = "co.fs2"                      %% "fs2-io"                               % VersionsOf.fs2
   private val http4sClient    = "org.http4s"                  %% "http4s-blaze-client"                  % VersionsOf.http4s
@@ -18,7 +17,6 @@ object Dependencies {
   val all: Seq[ModuleID] = Seq(
     betterFiles,
     bouncyCastle,
-    commonsIO,
     fs2Core,
     fs2IO,
     janino,
